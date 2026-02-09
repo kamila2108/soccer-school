@@ -1,0 +1,195 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ユーザーテーブル
+model User {
+  id            String   @id @default(cuid())
+  lineUserId    String   @unique
+  name          String
+  email         String?
+  phone         String?
+  grade         String?
+  profileImage  String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // リレーション
+  applications  Application[]
+  reservations  Reservation[]
+  payments      Payment[]
+  notifications Notification[]
+
+  @@map("users")
+}
+
+// 入会申込みテーブル
+model Application {
+  id          String            @id @default(cuid())
+  userId      String
+  name        String
+  nameKana    String
+  grade       String
+  phone       String?
+  email       String?
+  parentName  String?
+  notes       String?
+  status      ApplicationStatus @default(PENDING)
+  rejectedReason String?
+  adminNotes  String?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  // リレーション
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("applications")
+}
+
+enum ApplicationStatus {
+  PENDING   // 未確認
+  APPROVED  // 承認
+  REJECTED  // 却下
+}
+
+// 練習枠テーブル
+model PracticeSlot {
+  id          String   @id @default(cuid())
+  date        DateTime
+  startTime   String
+  endTime     String
+  capacity    Int
+  currentBookings Int  @default(0)
+  status      SlotStatus @default(OPEN)
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // リレーション
+  reservations Reservation[]
+
+  @@map("practice_slots")
+}
+
+enum SlotStatus {
+  OPEN      // 受付中
+  FULL      // 満席
+  CLOSED    // 受付終了
+  CANCELLED // 中止
+}
+
+// 予約テーブル
+model Reservation {
+  id            String            @id @default(cuid())
+  userId        String
+  practiceSlotId String
+  status        ReservationStatus @default(ACTIVE)
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  cancelledAt   DateTime?
+
+  // リレーション
+  user          User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  practiceSlot  PracticeSlot      @relation(fields: [practiceSlotId], references: [id], onDelete: Cascade)
+
+  @@map("reservations")
+}
+
+enum ReservationStatus {
+  ACTIVE    // 予約中
+  CANCELLED // キャンセル済み
+  COMPLETED // 参加済み
+}
+
+// 決済テーブル
+model Payment {
+  id            String        @id @default(cuid())
+  userId        String
+  type          PaymentType
+  amount        Int
+  status        PaymentStatus @default(PENDING)
+  stripePaymentId String?
+  eventId       String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  // リレーション
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("payments")
+}
+
+enum PaymentType {
+  MONTHLY_FEE  // 月謝
+  EVENT_FEE    // イベント参加費
+}
+
+enum PaymentStatus {
+  PENDING   // 未決済
+  COMPLETED // 決済完了
+  FAILED    // 決済失敗
+  REFUNDED  // 返金済み
+}
+
+// イベントテーブル
+model Event {
+  id            String      @id @default(cuid())
+  title         String
+  date          DateTime
+  startTime     String
+  endTime       String
+  location      String?
+  targetGrade   String?
+  capacity      Int?
+  fee           Int         @default(0)
+  deadline      DateTime?
+  description   String?
+  isPublished   Boolean     @default(false)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@map("events")
+}
+
+// 通知テーブル
+model Notification {
+  id          String   @id @default(cuid())
+  userId      String
+  type        NotificationType
+  title       String
+  message     String
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  // リレーション
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+enum NotificationType {
+  APPLICATION_STATUS // 入会申込みステータス
+  EVENT              // イベント
+  PAYMENT            // 決済
+  RESERVATION        // 予約
+}
+
+// 管理者テーブル
+model Admin {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  password    String
+  name        String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("admins")
+}
