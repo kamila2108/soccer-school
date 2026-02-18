@@ -47,22 +47,34 @@ export async function GET(request: NextRequest) {
     }
 
     // データ形式を変換（スネークケース → キャメルケース）
-    const reservations = (data || []).map((reservation) => ({
-      id: reservation.id,
-      status: reservation.status,
-      createdAt: reservation.created_at,
-      cancelledAt: reservation.cancelled_at,
-      practiceSlot: {
-        id: reservation.practice_slots.id,
-        date: reservation.practice_slots.practice_date || reservation.practice_slots.date,
-        startTime: reservation.practice_slots.start_time,
-        endTime: reservation.practice_slots.end_time,
-        capacity: reservation.practice_slots.capacity,
-        currentBookings: reservation.practice_slots.current_reservations || reservation.practice_slots.current_bookings || 0,
-        status: (reservation.practice_slots.status || '').toUpperCase(),
-        notes: reservation.practice_slots.notes,
-      },
-    }))
+    const reservations = (data || []).map((reservation) => {
+      // practice_slotsが配列の場合は最初の要素を取得、そうでない場合はそのまま使用
+      const practiceSlot = Array.isArray(reservation.practice_slots) 
+        ? reservation.practice_slots[0] 
+        : reservation.practice_slots
+
+      if (!practiceSlot) {
+        // practice_slotsが存在しない場合はスキップ
+        return null
+      }
+
+      return {
+        id: reservation.id,
+        status: reservation.status,
+        createdAt: reservation.created_at,
+        cancelledAt: reservation.cancelled_at,
+        practiceSlot: {
+          id: practiceSlot.id,
+          date: practiceSlot.practice_date,
+          startTime: practiceSlot.start_time,
+          endTime: practiceSlot.end_time,
+          capacity: practiceSlot.capacity,
+          currentBookings: practiceSlot.current_reservations || 0,
+          status: (practiceSlot.status || '').toUpperCase(),
+          notes: practiceSlot.notes,
+        },
+      }
+    }).filter((reservation) => reservation !== null)
 
     return NextResponse.json({ reservations })
   } catch (error) {
