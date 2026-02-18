@@ -1,40 +1,30 @@
-import { ReactNode } from 'react'
+'use client'
 
-interface ButtonProps {
-  children: ReactNode
-  onClick?: () => void
-  href?: string
+type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: 'primary' | 'secondary' | 'outline'
-  className?: string
 }
 
-export default function Button({ 
-  children, 
-  onClick, 
-  href, 
+export default function Button({
+  children,
   variant = 'primary',
-  className = '' 
+  className = '',
+  ...props
 }: ButtonProps) {
-  const baseClasses = 'px-6 py-3 rounded-lg font-semibold transition duration-200'
-  
-  const variantClasses = {
-    primary: 'bg-green-600 text-white hover:bg-green-700',
-    secondary: 'bg-gray-600 text-white hover:bg-gray-700',
-    outline: 'border-2 border-green-600 text-green-600 hover:bg-green-50'
-  }
+  const baseClass =
+    'inline-flex items-center justify-center rounded-lg font-semibold focus:outline-none focus:ring-2 focus:ring-offset-2 transition'
 
-  const classes = `${baseClasses} ${variantClasses[variant]} ${className}`
-
-  if (href) {
-    return (
-      <a href={href} className={classes}>
-        {children}
-      </a>
-    )
-  }
+  const variantClass =
+    variant === 'primary'
+      ? 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500'
+      : variant === 'outline'
+      ? 'bg-white text-green-600 border border-green-600 hover:bg-green-50 focus:ring-green-500'
+      : 'bg-white text-green-600 border border-green-600 hover:bg-green-50 focus:ring-green-500'
 
   return (
-    <button onClick={onClick} className={classes}>
+    <button
+      className={`${baseClass} ${variantClass} px-4 py-2 ${className}`}
+      {...props}
+    >
       {children}
     </button>
   )

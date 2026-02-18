@@ -16,10 +16,16 @@ export default function Home() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/login"
+              href="/member/practice-slots"
               className="bg-green-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-green-700 transition shadow-lg"
             >
-              ログイン
+              練習予約
+            </Link>
+            <Link
+              href="/entry"
+              className="bg-white text-green-600 border-2 border-green-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-green-50 transition"
+            >
+              入会申込み
             </Link>
             <Link
               href="/about"
@@ -73,12 +79,20 @@ export default function Home() {
           <p className="text-xl mb-8 text-green-100">
             無料体験レッスンも実施しています。お気軽にお問い合わせください。
           </p>
-          <Link
-            href="/contact"
-            className="bg-white text-green-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition inline-block"
-          >
-            お問い合わせ
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="/entry"
+              className="bg-white text-green-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition inline-block"
+            >
+              入会申込み
+            </Link>
+            <Link
+              href="/contact"
+              className="bg-green-700 text-white border-2 border-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-green-800 transition inline-block"
+            >
+              お問い合わせ
+            </Link>
+          </div>
         </div>
       </section>
     </div>

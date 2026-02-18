@@ -71,19 +71,29 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         
         // データベースからユーザー情報を取得
         try {
-          const { data: userData } = await supabase
+          const { data: userData, error: userError } = await supabase
             .from('users')
             .select('id, line_user_id, name, email')
             .eq('line_user_id', token.sub)
-            .single()
+            .maybeSingle()
   
-          if (userData) {
+          if (userError) {
+            console.error('ユーザー情報取得エラー:', userError)
+          } else if (userData) {
             session.user.dbId = userData.id // データベースのユーザーID
             session.user.lineUserId = userData.line_user_id // LINEユーザーID
+            console.log('セッションにユーザー情報を設定:', {
+              dbId: userData.id,
+              lineUserId: userData.line_user_id,
+            })
+          } else {
+            console.warn('ユーザー情報が見つかりませんでした。line_user_id:', token.sub)
           }
         } catch (error) {
-          console.error('ユーザー情報取得エラー:', error)
+          console.error('ユーザー情報取得エラー（予期しないエラー）:', error)
         }
+      } else {
+        console.warn('token.subが存在しません')
       }
       return session
     },

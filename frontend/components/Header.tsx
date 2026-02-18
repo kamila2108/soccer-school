@@ -36,6 +36,29 @@ export default function Header() {
             <Link href="/contact" className="text-gray-700 hover:text-green-600 transition">
               お問い合わせ
             </Link>
+            {/* ログイン済みのときだけ会員ページと入会申込みへのリンクを表示 */}
+            {status === 'authenticated' && (
+              <>
+                <Link
+                  href="/member/practice-slots"
+                  className="text-gray-700 hover:text-green-600 transition"
+                >
+                  練習予約
+                </Link>
+                <Link
+                  href="/entry"
+                  className="text-gray-700 hover:text-green-600 transition"
+                >
+                  入会申込み
+                </Link>
+                <Link
+                  href="/member"
+                  className="text-gray-700 hover:text-green-600 transition"
+                >
+                  会員ページ
+                </Link>
+              </>
+            )}
             
             {/* ログイン状態に応じてボタンを表示 */}
             {status === 'loading' ? (
@@ -102,6 +125,32 @@ export default function Header() {
             >
               お問い合わせ
             </Link>
+            {/* ログイン済みのときだけ会員ページと入会申込みへのリンクを表示 */}
+            {status === 'authenticated' && (
+              <>
+                <Link
+                  href="/member/practice-slots"
+                  className="block py-2 text-gray-700 hover:text-green-600"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  練習予約
+                </Link>
+                <Link
+                  href="/entry"
+                  className="block py-2 text-gray-700 hover:text-green-600"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  入会申込み
+                </Link>
+                <Link
+                  href="/member"
+                  className="block py-2 text-gray-700 hover:text-green-600"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  会員ページ
+                </Link>
+              </>
+            )}
             
             {/* ログイン状態に応じてボタンを表示 */}
             {status === 'loading' ? (
