@@ -89,10 +89,12 @@ export async function GET(request: NextRequest) {
         // データベースのステータスと実際のステータスが異なる場合は、データベースを更新
         if (calculatedStatus !== dbStatus) {
           // 非同期で更新（レスポンスをブロックしない）
-          supabaseAdmin
-            .from('practice_slots')
-            .update({ status: calculatedStatus.toLowerCase() })
-            .eq('id', slot.id)
+          Promise.resolve(
+            supabaseAdmin
+              .from('practice_slots')
+              .update({ status: calculatedStatus.toLowerCase() })
+              .eq('id', slot.id)
+          )
             .then(({ error }) => {
               if (error) {
                 console.error(`練習枠 ${slot.id} のステータス更新エラー:`, error)
